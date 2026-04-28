@@ -1,0 +1,6 @@
+veo_clips/
+*.mp4
+*.png
+!frames-webp/
+!frames-mobile/
+.git/
