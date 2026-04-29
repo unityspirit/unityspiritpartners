@@ -111,22 +111,12 @@ function drawFrame(idx) {
 }
 
 /* ── Scroll input ───────────────────────── */
-addEventListener('wheel', e => {
+const stage = document.querySelector('.stage');
+stage.addEventListener('scroll', () => {
   if (!isReady) return;
-  let d = e.deltaY;
-  if (e.deltaMode === 1) d *= 30;
-  if (e.deltaMode === 2) d *= innerHeight;
-  targetFrame += d * SCROLL_SPEED_WHEEL;
-  clampFrame();
-}, { passive: true });
-
-let touchY = 0;
-addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
-addEventListener('touchmove', e => {
-  if (!isReady) return;
-  const dy = touchY - e.touches[0].clientY;
-  touchY = e.touches[0].clientY;
-  targetFrame += dy * 0.8;
+  const maxScroll = stage.scrollHeight - stage.clientHeight;
+  const progress = maxScroll > 0 ? stage.scrollTop / maxScroll : 0;
+  targetFrame = progress * (TOTAL_FRAMES - 1);
   clampFrame();
 }, { passive: true });
 
@@ -135,10 +125,8 @@ function clampFrame() {
 }
 
 function scrollToPage(i) {
-  // Map page index to frame range
-  const framesPerPage = TOTAL_FRAMES / PAGE_COUNT;
-  targetFrame = i * framesPerPage;
-  clampFrame();
+  const p = pages[i];
+  if (p) stage.scrollTo({ top: p.offsetTop, behavior: 'smooth' });
 }
 
 document.querySelectorAll('[data-scroll]').forEach(el => {
@@ -164,16 +152,22 @@ let lastIdx = -1;
 function updateUI() {
   const progress = currentFrame / (TOTAL_FRAMES - 1);
   progressFill.style.transform = `scaleX(${Math.min(1, progress)})`;
-
-  const framesPerPage = TOTAL_FRAMES / PAGE_COUNT;
-  const idx = Math.min(PAGE_COUNT - 1, Math.floor(currentFrame / framesPerPage + 0.35));
-
-  pages.forEach((p, i) => p.classList.toggle('is-active', i === idx));
-  navLinks.forEach((l, i) => l.classList.toggle('active', i === idx));
-  drawerLinks.forEach((l, i) => l.classList.toggle('active', i === idx));
-
-  if (idx !== lastIdx) { lastIdx = idx; runCounters(idx); }
 }
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = pages.indexOf(entry.target);
+      if (idx !== -1) {
+        pages.forEach((p, i) => p.classList.toggle('is-active', i === idx));
+        navLinks.forEach((l, i) => l.classList.toggle('active', i === idx));
+        drawerLinks.forEach((l, i) => l.classList.toggle('active', i === idx));
+        if (idx !== lastIdx) { lastIdx = idx; runCounters(idx); }
+      }
+    }
+  });
+}, { root: stage, rootMargin: '-40% 0px -40% 0px' });
+pages.forEach(p => observer.observe(p));
 
 /* ── Counters ───────────────────────────── */
 function runCounters(pi) {
