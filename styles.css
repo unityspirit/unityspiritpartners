@@ -4,7 +4,7 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--fg);font-family:'Manrope','Inter',system-ui,sans-serif;overflow:hidden;height:100vh}
 
 /* TEXT STROKE — readability over dynamic Veo backgrounds */
-#ui-layer *{text-shadow:var(--ts)}
+p, h1, h2, h3, h4, h5, h6, span:not(.gradient-text), a, button, input, label, li, strong, em, .badge, .scroll-hint, .metric-val, .metric-suffix, .metric-label, .trust-label{text-shadow:var(--ts)}
 .gradient-text{display:inline-block;position:relative;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none!important;-webkit-text-stroke:2px #000;paint-order:stroke fill}
 .nav-cta,.btn-primary,.nav-drawer-cta,.testimonial-avatar{text-shadow:var(--ts)}
 
