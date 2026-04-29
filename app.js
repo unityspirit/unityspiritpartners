@@ -111,11 +111,10 @@ function drawFrame(idx) {
 }
 
 /* ── Scroll input ───────────────────────── */
-const stage = document.querySelector('.stage');
-stage.addEventListener('scroll', () => {
+window.addEventListener('scroll', () => {
   if (!isReady) return;
-  const maxScroll = stage.scrollHeight - stage.clientHeight;
-  const progress = maxScroll > 0 ? stage.scrollTop / maxScroll : 0;
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
   targetFrame = progress * (TOTAL_FRAMES - 1);
   clampFrame();
 }, { passive: true });
@@ -126,7 +125,7 @@ function clampFrame() {
 
 function scrollToPage(i) {
   const p = pages[i];
-  if (p) stage.scrollTo({ top: p.offsetTop, behavior: 'smooth' });
+  if (p) window.scrollTo({ top: p.offsetTop, behavior: 'smooth' });
 }
 
 document.querySelectorAll('[data-scroll]').forEach(el => {
@@ -166,7 +165,7 @@ const observer = new IntersectionObserver((entries) => {
       }
     }
   });
-}, { root: stage, rootMargin: '-40% 0px -40% 0px' });
+}, { root: null, rootMargin: '-40% 0px -40% 0px' });
 pages.forEach(p => observer.observe(p));
 
 /* ── Counters ───────────────────────────── */
