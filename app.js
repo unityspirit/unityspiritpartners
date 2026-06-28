@@ -81,7 +81,6 @@ async function loadAllFrames() {
       await loadFrame(idx);
       loaded++;
       const realPct = Math.floor((loaded / TOTAL_FRAMES) * 100);
-      if (!preloaderDismissed) {
         const visualPct = Math.min(Math.round((realPct / PRELOADER_THRESHOLD) * 100), 100);
         loaderBar.style.width = visualPct + '%';
         loaderPct.textContent = visualPct;
@@ -225,7 +224,7 @@ function onReady() {
   isReady = true;
   // Draw the first frame immediately
   drawFrame(0);
-  if (!preloaderDismissed) { loader.style.transition='opacity 0.7s';loader.style.opacity='0';setTimeout(function(){loader.style.display='none'},700); }
+  loader.style.transition='opacity 0.7s';loader.style.opacity='0';setTimeout(function(){loader.style.display='none'},700);
   const slb = document.getElementById('siteLoadingBar');
   const slbTxt = document.getElementById('siteLoadingText');
   if (slbTxt) slbTxt.textContent = 'Loading complete';
