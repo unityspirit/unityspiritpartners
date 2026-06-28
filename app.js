@@ -27,6 +27,8 @@ const ctx = canvas.getContext('2d');
 let targetFrame = 0;
 let currentFrame = 0;
 let isReady = false;
+let preloaderDismissed = false;
+const PRELOADER_THRESHOLD = 15;
 const frames = new Array(TOTAL_FRAMES);
 
 /* ── Canvas sizing (HiDPI) ──────────────── */
@@ -78,10 +80,25 @@ async function loadAllFrames() {
       if (idx === undefined) return;
       await loadFrame(idx);
       loaded++;
-      const pct = Math.floor((loaded / TOTAL_FRAMES) * 100);
-      loaderBar.style.width = pct + '%';
-      loaderPct.textContent = pct;
-      loaderCap.textContent = msgs[Math.min(msgs.length - 1, Math.floor(pct / 22))];
+      const realPct = Math.floor((loaded / TOTAL_FRAMES) * 100);
+      if (!preloaderDismissed) {
+        const visualPct = Math.min(Math.round((realPct / PRELOADER_THRESHOLD) * 100), 100);
+        loaderBar.style.width = visualPct + '%';
+        loaderPct.textContent = visualPct;
+        if (loaderCap) loaderCap.textContent = msgs[Math.min(msgs.length - 1, Math.floor(visualPct / 22))];
+        if (realPct >= PRELOADER_THRESHOLD) {
+          preloaderDismissed = true;
+          setTimeout(() => { loader.classList.add('hidden'); if (typeof initEffects === 'function') initEffects(); }, 400);
+          const slb = document.getElementById('siteLoadingBar');
+          setTimeout(() => { if(slb) slb.classList.add('active'); }, 600);
+        }
+      } else {
+        const fill = document.getElementById('siteLoadingFillInner');
+        const txt = document.getElementById('siteLoadingText');
+        const phase2Pct = Math.round(((realPct - PRELOADER_THRESHOLD) / (100 - PRELOADER_THRESHOLD)) * 100);
+        if (fill) fill.style.width = phase2Pct + '%';
+        if (txt) txt.textContent = 'Loading video ' + realPct + '%';
+      }
     }
   }
 
@@ -208,7 +225,11 @@ function onReady() {
   isReady = true;
   // Draw the first frame immediately
   drawFrame(0);
-  setTimeout(() => { loader.classList.add('hidden'); initEffects(); }, 400);
+  if (!preloaderDismissed) { loader.classList.add('hidden'); }
+  const slb = document.getElementById('siteLoadingBar');
+  const slbTxt = document.getElementById('siteLoadingText');
+  if (slbTxt) slbTxt.textContent = 'Loading complete';
+  setTimeout(() => { if(slb) { slb.classList.remove('active'); slb.classList.add('done'); } }, 800);
 }
 
 /* ── Effects (GSAP-free) ─────────────────── */
