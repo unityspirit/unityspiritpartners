@@ -1,4 +1,4 @@
-/* ─── Unity Spirit Partners — ScrollCanvas Engine ─── */
+﻿/* ─── Unity Spirit Partners — ScrollCanvas Engine ─── */
 'use strict';
 
 /* ── Constants ──────────────────────────── */
@@ -93,7 +93,9 @@ async function loadAllFrames() {
           setTimeout(() => { if(slb) slb.style.opacity='1';slb.style.visibility='visible'; }, 600);
         }
       } else {
-        const fill = document.getElementById('siteLoadingFillInner');
+      const fill = document.getElementById('slbFill');
+      const txt = document.getElementById('siteLoadingText');
+      const txt = document.getElementById('siteLoadingText');
         const txt = document.getElementById('siteLoadingText');
         const phase2Pct = Math.round(((realPct - PRELOADER_THRESHOLD) / (100 - PRELOADER_THRESHOLD)) * 100);
         if (fill) fill.style.width = phase2Pct + '%';
